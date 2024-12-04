@@ -1,10 +1,42 @@
-version: '3'
+
+
 services:
-  postgres:
-    image: 'postgres:9.6.1'
-    ports:
-      - '5432:5432'
+  api:
+    container_name: nome_da_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app 
+      - /app/node_modules 
     environment:
-      POSTGRES_USER: 'test'
-      POSTGRES_PASSWORD: 'test'
-      POSTGRES_DB: 'test'
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_NAME=nome_banco
+    networks:
+      - docker-network
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+
+  db:
+    container_name: nome_do_servico_db
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: nome_banco
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - docker-network
+
+networks:
+  docker-network:
+    driver: bridge
+
+volumes:
+  pgdata:
